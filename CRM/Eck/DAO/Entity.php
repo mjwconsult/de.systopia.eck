@@ -258,12 +258,11 @@ class CRM_Eck_DAO_Entity extends CRM_Core_DAO {
     \CRM_Utils_Hook::pre($hook, 'Eck_' . $record['entity_type'], $record['id'] ?? NULL, $record);
     $instance = new self($record['entity_type']);
     $instance->copyValues($record);
-    $instance->save();
-
-    // Store custom field values.
+    // @fixme: We'll need a version_compare here to be compatible with core if https://github.com/civicrm/civicrm-core/pull/33005 is merged
     if (!empty($record['custom']) && is_array($record['custom'])) {
-      CRM_Core_BAO_CustomValueTable::store($record['custom'], $instance->tableName(), $instance->id);
+      $instance->_custom = $record['custom'];
     }
+    $instance->save();
 
     \CRM_Utils_Hook::post($hook, 'Eck_' . $record['entity_type'], $instance->id, $instance);
 
